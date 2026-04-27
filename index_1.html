@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ろれる（月鏡の灯籠）| VRChatホスト・MC・音楽箱博物館</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --accent: #7c6ee0;
+    --accent2: #3dbfa0;
+    --border: rgba(124,110,224,0.2);
+    --text: #1a1c2e;
+    --muted: #4a4d6a;
+    --night: #1a1c2e;
+    --serif: 'Noto Serif JP', serif;
+    --sans: 'Noto Sans JP', sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: #f0effe; color: var(--text); font-family: var(--sans); font-weight: 400; line-height: 1.8; min-height: 100vh; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 2.5rem;
+    background: rgba(240,239,254,0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .nav-logo { font-family: var(--serif); font-size: 1.1rem; letter-spacing: 0.15em; color: var(--accent); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { text-decoration: none; color: #4a4d6a; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+
+  .hero {
+    padding: 7rem 2rem 3rem;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 70% at 50% 30%, rgba(140,120,255,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 70% 80%, rgba(60,200,170,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-badge { display: inline-block; font-size: 0.72rem; letter-spacing: 0.2em; color: var(--accent2); border: 0.5px solid var(--accent2); padding: 0.35rem 1rem; border-radius: 2rem; margin-bottom: 1.5rem; font-weight: 500; }
+  .hero h1 { font-family: var(--serif); font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 400; letter-spacing: 0.2em; line-height: 1.2; margin-bottom: 0.3rem; color: var(--night); }
+  .hero-yago { font-family: var(--serif); font-size: 1rem; letter-spacing: 0.12em; color: #4a4d6a; margin-bottom: 1.5rem; font-weight: 400; }
+  .hero-desc { max-width: 520px; font-size: 0.95rem; color: #4a4d6a; line-height: 2; margin-bottom: 2rem; font-weight: 400; }
+  .hero-cta { display: inline-block; padding: 0.75rem 2.2rem; border: 1.5px solid var(--accent); color: var(--accent); text-decoration: none; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.15em; border-radius: 2rem; transition: all 0.25s; }
+  .hero-cta:hover { background: var(--accent); color: #fff; }
+
+  section { padding: 4rem 2rem; max-width: 960px; margin: 0 auto; }
+  .section-title { font-family: var(--serif); font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 400; letter-spacing: 0.08em; margin-bottom: 2.5rem; line-height: 1.6; color: var(--night); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+  .card { background: #fff; border: 1px solid rgba(124,110,224,0.25); border-radius: 12px; padding: 1.8rem 1.5rem; position: relative; overflow: hidden; cursor: pointer; transition: border-color 0.25s, box-shadow 0.25s; }
+  .card:hover { border-color: var(--accent); box-shadow: 0 4px 24px rgba(124,110,224,0.1); }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); opacity: 0; transition: opacity 0.25s; }
+  .card:hover::before { opacity: 1; }
+  .card-tag { display: inline-block; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--accent); border: 1px solid var(--accent); padding: 0.2rem 0.7rem; border-radius: 2rem; margin-bottom: 1rem; font-weight: 500; }
+  .card h3 { font-family: var(--serif); font-size: 1.05rem; font-weight: 500; margin-bottom: 0.6rem; line-height: 1.5; color: var(--night); }
+  .card p { font-size: 0.84rem; color: #4a4d6a; line-height: 1.8; font-weight: 400; }
+  .card-hint { display: flex; align-items: center; gap: 0.3rem; margin-top: 1.2rem; font-size: 0.72rem; color: var(--accent); letter-spacing: 0.08em; font-weight: 500; opacity: 0; transition: opacity 0.2s; }
+  .card:hover .card-hint { opacity: 1; }
+  .card-hint::after { content: '→'; }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(30,32,53,0.55); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 2rem; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 16px; max-width: 600px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 2.5rem; position: relative; animation: modalIn 0.22s ease; }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(16px) scale(0.97); } to { opacity: 1; transform: none; } }
+  .modal-close { position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: 1px solid rgba(124,110,224,0.3); border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: #4a4d6a; transition: all 0.2s; }
+  .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+  .modal-tag { display: inline-block; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--accent); border: 1px solid var(--accent); padding: 0.2rem 0.7rem; border-radius: 2rem; margin-bottom: 1rem; font-weight: 500; }
+  .modal h2 { font-family: var(--serif); font-size: 1.5rem; font-weight: 500; color: var(--night); margin-bottom: 1rem; line-height: 1.4; }
+  .modal-body { font-size: 0.88rem; color: #4a4d6a; line-height: 2; font-weight: 400; }
+  .modal-body p + p { margin-top: 1em; }
+  .modal-img { width: 100%; border-radius: 8px; margin-bottom: 1.2rem; object-fit: cover; max-height: 240px; }
+  .modal-divider { border: none; border-top: 1px solid rgba(124,110,224,0.15); margin: 1.5rem 0; }
+  .modal-meta { display: flex; flex-wrap: wrap; gap: 1rem; }
+  .modal-meta-item { font-size: 0.78rem; color: #4a4d6a; font-weight: 400; }
+  .modal-meta-item strong { color: var(--text); font-weight: 600; display: block; font-size: 0.7rem; letter-spacing: 0.1em; margin-bottom: 0.2rem; }
+
+  /* スライダー */
+  .slider { position: relative; margin-bottom: 0.6rem; border-radius: 8px; overflow: hidden; }
+  .slider-track { display: flex; transition: transform 0.35s ease; }
+  .slider-track img { width: 100%; flex-shrink: 0; object-fit: cover; max-height: 240px; }
+  .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.85); border: 1px solid var(--border); border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--accent); transition: all 0.2s; z-index: 10; }
+  .slider-btn:hover { background: #fff; box-shadow: 0 2px 8px rgba(124,110,224,0.2); }
+  .slider-prev { left: 0.6rem; }
+  .slider-next { right: 0.6rem; }
+  .slider-dots { display: flex; justify-content: center; gap: 0.4rem; margin-bottom: 1rem; }
+  .slider-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(124,110,224,0.25); cursor: pointer; transition: background 0.2s; border: none; padding: 0; }
+  .slider-dot.active { background: var(--accent); }
+
+  .divider { border: none; border-top: 1px solid rgba(124,110,224,0.15); margin: 0; }
+  .contact-inner { text-align: center; max-width: 580px; margin: 0 auto; }
+  .contact-note { font-size: 0.82rem; color: var(--accent2); line-height: 1.8; margin-bottom: 1.2rem; border: 1px solid var(--accent2); border-radius: 8px; padding: 0.8rem 1.2rem; background: rgba(61,191,160,0.05); font-weight: 500; }
+  .contact-inner > p { font-size: 0.92rem; color: #4a4d6a; line-height: 1.9; margin-bottom: 2rem; font-weight: 400; }
+  .contact-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+  .contact-link { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.6rem; border: 1px solid rgba(124,110,224,0.3); color: var(--text); text-decoration: none; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em; border-radius: 2rem; transition: all 0.2s; }
+  .contact-link:hover { border-color: var(--accent2); color: var(--accent2); }
+  footer { border-top: 1px solid rgba(124,110,224,0.15); padding: 2rem; text-align: center; font-size: 0.72rem; color: #4a4d6a; letter-spacing: 0.1em; font-weight: 400; }
+
+  @media (max-width: 600px) {
+    nav { padding: 1rem 1.25rem; }
+    .nav-links { gap: 1.2rem; }
+    section { padding: 3rem 1.25rem; }
+    .modal { padding: 1.8rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">ろれる</div>
+  <ul class="nav-links">
+    <li><a href="#works">実績</a></li>
+    <li><a href="#contact">お問い合わせ</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">VRChat ホスト・MC</div>
+  <h1>ろれる</h1>
+  <p class="hero-yago">（月鏡の灯籠）</p>
+  <p class="hero-desc">
+    バーチャル空間（VRChat）をメインの舞台に、MCとイベントホストとして活動。また、現実空間においてもVRの体験などを実施（例：高校・企業様）。<br>
+    音・空間・物語をつなぐ体験を通し、<br>
+    VR×現実の双方向をつなぐ活動を目指して活動中。
+  </p>
+  <a href="#works" class="hero-cta">実績を見る</a>
+</div>
+
+<section id="works">
+  <h2 class="section-title">主な活動・実績</h2>
+  <div class="card-grid">
+    <div class="card" onclick="openModal('mc')">
+      <span class="card-tag">VRChat MC</span>
+      <h3>法人イベントMC</h3>
+      <p>VRChat上でのイベント進行・司会。法人案件の実績あり。</p>
+      <div class="card-hint">詳しく見る</div>
+    </div>
+    <div class="card" onclick="openModal('museum')">
+      <span class="card-tag">博物館</span>
+      <h3>VRオルゴール館・星月の自鳴館</h3>
+      <p>オルゴールに特化したメタバース（VR）オルゴール博物館。常設空間として運営中。</p>
+      <div class="card-hint">詳しく見る</div>
+    </div>
+    <div class="card" onclick="openModal('secretary')">
+      <span class="card-tag">秘書・マネージャー</span>
+      <h3>秘書・マネージャー</h3>
+      <p>過去に3Dモデル制作会社「黒猫洋品店」にて外部秘書としてスケジュール管理・イベント管轄などを担当。</p>
+      <div class="card-hint">詳しく見る</div>
+    </div>
+    <div class="card" onclick="openModal('vr')">
+      <span class="card-tag">VR・メタバース</span>
+      <h3>VR（メタバース）体験・アドバイス</h3>
+      <p>VR（メタバース）の体験会や企業での活用方法などのアドバイス。高校や企業へのVR体験を実施。</p>
+      <div class="card-hint">詳しく見る</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="contact">
+  <div class="contact-inner">
+    <h2 class="section-title">お仕事・コラボのご相談</h2>
+    <p class="contact-note">※VRオルゴール館の貸切集会をご希望の方はXのDMやメンションください。無償で行います。</p>
+    <p>VRChatイベントのMC・ホスト依頼、<br>コラボ・出演のお誘いなど、お気軽にご連絡ください。</p>
+    <div class="contact-links">
+      <!-- ★ href="#" の # を実際のURLに変えてください -->
+      <a href="#" class="contact-link">🐦 X（旧Twitter）</a>
+      <a href="#" class="contact-link">▶ YouTube</a>
+      <a href="#" class="contact-link">🌐 VRChat</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 ろれる（月鏡の灯籠）</p>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeOnOverlay(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const data = {
+  mc: {
+    tag: 'VRChat MC・イベントホスト',
+    title: 'MC・イベントホスト',
+    imgs: [],
+    body: `
+      <p>VRChat上でのイベント司会・進行役として活動しています。企業主催の大規模イベントから、コミュニティ主催の小規模なものまで幅広く対応。また、株式会社キュリアスワールド様と共に「メタバース（VR）を用いた英会話勉強」などを継続中。</p>
+      <p>場の空気を読みながら、参加者全員が楽しめる進行を心がけています。事前の台本作成・進行設計からサポート可能です。</p>
+    `,
+    meta: [
+      { label: '対応形式', value: '企業イベント・コミュニティイベント' },
+      { label: '活動場所', value: 'VRChat・現実空間' },
+    ]
+  },
+  museum: {
+    tag: '博物館',
+    title: 'VRオルゴール館・星月の自鳴館',
+    imgs: [
+      'images/F2IsQ8caYAArUWY.jpg',
+      'images/GrxMva4XMAAO8d2.jpg',
+      'images/HC3sbZTboAEQaFh.jpg'
+    ],
+    body: `
+      <p>オルゴールに特化したメタバース（VR）オルゴール博物館です。月一回、VRChatにて定期解説会を開催しています。具体的な日程はX（旧Twitter）にて一週間ほど前に告知します。</p>
+      <p>様々な珍しいオルゴールを展示し、音と空間の体験を通じてその魅力を伝えることを目的としています。</p>
+    `,
+    meta: [
+      { label: '場所', value: 'VRChat' },
+      { label: '入場', value: '無料' },
+    ]
+  },
+  secretary: {
+    tag: '秘書・マネージャー',
+    title: '秘書・マネージャー',
+    imgs: [],
+    body: `
+      <p>過去に3Dモデル制作会社「黒猫洋品店」にて、外部秘書としてお手伝いしたことがあります。</p>
+      <p>主に、スケジュール管理やイベント管轄、クライアントとの折衝などを行っていました。</p>
+    `,
+    meta: [
+      { label: '関わった組織', value: '黒猫洋品店（3Dモデル制作会社）' },
+      { label: '役割', value: '外部秘書' },
+      { label: '主な業務', value: 'スケジュール管理・イベント管轄・クライアント折衝' },
+    ]
+  },
+  vr: {
+    tag: 'VR・メタバース',
+    title: 'VR（メタバース）体験・アドバイス',
+    imgs: [],
+    body: `
+      <p>VR（メタバース）の体験会の実施や、企業での活用方法についてのアドバイスを行っています。</p>
+      <p>実績として、高校や企業へのVR（メタバース）体験を実施。初めての方にも分かりやすく、VRの魅力と可能性をお伝えします。</p>
+    `,
+    meta: [
+      { label: '対象', value: '高校・企業 など' },
+      { label: '内容', value: 'VR体験会・活用アドバイス' },
+    ]
+  }
+};
+
+let currentSlide = 0;
+
+function buildSlider(imgs) {
+  if (!imgs || imgs.length === 0) return '';
+  if (imgs.length === 1) {
+    return `<img src="${imgs[0]}" alt="" class="modal-img">`;
+  }
+  const slides = imgs.map(src =>
+    `<img src="${src}" alt="" style="width:100%;flex-shrink:0;object-fit:cover;max-height:240px;">`
+  ).join('');
+  const dots = imgs.map((_, i) =>
+    `<button class="slider-dot${i === 0 ? ' active' : ''}" onclick="goSlide(${i})"></button>`
+  ).join('');
+  return `
+    <div class="slider">
+      <div class="slider-track" id="sliderTrack">${slides}</div>
+      <button class="slider-btn slider-prev" onclick="moveSlide(-1)">‹</button>
+      <button class="slider-btn slider-next" onclick="moveSlide(1)">›</button>
+    </div>
+    <div class="slider-dots" id="sliderDots">${dots}</div>
+  `;
+}
+
+function moveSlide(dir) {
+  const track = document.getElementById('sliderTrack');
+  const dots = document.querySelectorAll('.slider-dot');
+  currentSlide = (currentSlide + dir + dots.length) % dots.length;
+  track.style.transform = `translateX(-${currentSlide * 100}%)`;
+  dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+}
+
+function goSlide(index) {
+  const track = document.getElementById('sliderTrack');
+  const dots = document.querySelectorAll('.slider-dot');
+  currentSlide = index;
+  track.style.transform = `translateX(-${currentSlide * 100}%)`;
+  dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+}
+
+function openModal(key) {
+  currentSlide = 0;
+  const d = data[key];
+  const sliderHtml = buildSlider(d.imgs);
+  const meta = d.meta.map(m =>
+    `<div class="modal-meta-item"><strong>${m.label}</strong>${m.value}</div>`
+  ).join('');
+  document.getElementById('modalContent').innerHTML = `
+    <span class="modal-tag">${d.tag}</span>
+    <h2>${d.title}</h2>
+    ${sliderHtml}
+    <div class="modal-body">${d.body}</div>
+    <hr class="modal-divider">
+    <div class="modal-meta">${meta}</div>
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeOnOverlay(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
