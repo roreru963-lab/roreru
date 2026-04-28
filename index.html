@@ -82,7 +82,6 @@
   .modal-meta-item { font-size: 0.78rem; color: #4a4d6a; font-weight: 400; }
   .modal-meta-item strong { color: var(--text); font-weight: 600; display: block; font-size: 0.7rem; letter-spacing: 0.1em; margin-bottom: 0.2rem; }
 
-  /* スライダー */
   .slider { position: relative; margin-bottom: 0.6rem; border-radius: 8px; overflow: hidden; }
   .slider-track { display: flex; transition: transform 0.35s ease; }
   .slider-track img { width: 100%; flex-shrink: 0; object-fit: cover; max-height: 240px; }
@@ -171,7 +170,6 @@
     <p class="contact-note">※VRオルゴール館の貸切集会をご希望の方はXのDMやメンションください。無償で行います。</p>
     <p>VRChatイベントのMC・ホスト依頼、<br>コラボ・出演のお誘いなど、お気軽にご連絡ください。</p>
     <div class="contact-links">
-      <!-- ★ href="#" の # を実際のURLに変えてください -->
       <a href="#" class="contact-link">🐦 X（旧Twitter）</a>
       <a href="#" class="contact-link">▶ YouTube</a>
       <a href="#" class="contact-link">🌐 VRChat</a>
@@ -239,7 +237,9 @@ const data = {
   vr: {
     tag: 'VR・メタバース',
     title: 'VR（メタバース）体験・アドバイス',
-    imgs: images/ELsF8IEy.jpg,
+    imgs: [
+      'images/ELsF8IEy.jpg'
+    ],
     body: `
       <p>VR（メタバース）の体験会の実施や、企業での活用方法についてのアドバイスを行っています。</p>
       <p>実績として、高校や企業へのVR（メタバース）体験を実施。初めての方にも分かりやすく、VRの魅力と可能性をお伝えします。</p>
@@ -267,8 +267,8 @@ function buildSlider(imgs) {
   return `
     <div class="slider">
       <div class="slider-track" id="sliderTrack">${slides}</div>
-      <button class="slider-btn slider-prev" onclick="moveSlide(-1)">‹</button>
-      <button class="slider-btn slider-next" onclick="moveSlide(1)">›</button>
+      <button class="slider-btn slider-prev" onclick="moveSlide(-1)">&#8249;</button>
+      <button class="slider-btn slider-next" onclick="moveSlide(1)">&#8250;</button>
     </div>
     <div class="slider-dots" id="sliderDots">${dots}</div>
   `;
